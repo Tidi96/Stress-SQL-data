@@ -1,0 +1,38 @@
+-- Find individuals with highest stress
+SELECT TOP 10 *
+FROM stress_data
+ORDER BY RecentStress DESC;
+
+-- Individuals with high stress AND sleep problems
+SELECT *
+FROM stress_data
+WHERE RecentStress >= 8 AND SleepProblems >= 8
+ORDER BY RecentStress DESC, SleepProblems DESC;
+
+-- Frequency distribution of stress levels
+SELECT 
+    RecentStress AS stress_level,
+    COUNT(*) AS frequency,
+    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM stress_data), 2) AS percentage
+FROM stress_data
+GROUP BY RecentStress
+ORDER BY RecentStress;
+
+-- Sleep problems histogram (grouped into categories)
+SELECT 
+    CASE 
+        WHEN SleepProblems BETWEEN 0 AND 3 THEN 'Low (0-3)'
+        WHEN SleepProblems BETWEEN 4 AND 6 THEN 'Medium (4-6)'
+        WHEN SleepProblems BETWEEN 7 AND 10 THEN 'High (7-10)'
+        ELSE 'Other'
+    END AS sleep_category,
+    COUNT(*) AS count,
+    AVG(RecentStress) AS avg_stress_in_category
+FROM stress_data
+GROUP BY CASE 
+        WHEN SleepProblems BETWEEN 0 AND 3 THEN 'Low (0-3)'
+        WHEN SleepProblems BETWEEN 4 AND 6 THEN 'Medium (4-6)'
+        WHEN SleepProblems BETWEEN 7 AND 10 THEN 'High (7-10)'
+        ELSE 'Other'
+    END
+ORDER BY sleep_category;
