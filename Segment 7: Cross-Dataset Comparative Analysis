@@ -1,0 +1,36 @@
+-- Compare average stress between both datasets
+SELECT 
+    'Stress Dataset' AS source,
+    AVG(RecentStress) AS avg_stress,
+    COUNT(*) AS sample_size
+FROM stress_data
+UNION ALL
+SELECT 
+    'Sleep Health Dataset' AS source,
+    AVG(StressLevel) AS avg_stress,
+    COUNT(*) AS sample_size
+FROM sleep_health_data;
+
+-- Stress and sleep problems by gender (combined analysis)
+SELECT 
+    'Stress Dataset' AS dataset,
+    CASE WHEN Gender = 1 THEN 'Male' WHEN Gender = 2 THEN 'Female' ELSE 'Other' END AS gender,
+    AVG(RecentStress) AS avg_stress,
+    AVG(SleepProblems) AS avg_sleep_problems,
+    COUNT(*) AS count
+FROM stress_data
+WHERE Gender IN (1, 2)
+GROUP BY Gender
+
+UNION ALL
+
+SELECT 
+    'Sleep Health Dataset' AS dataset,
+    Gender,
+    AVG(StressLevel) AS avg_stress,
+    AVG(QualityOfSleep) AS avg_sleep_quality,
+    COUNT(*) AS count
+FROM sleep_health_data
+WHERE Gender IN ('Male', 'Female')
+GROUP BY Gender 
+ORDER BY dataset, gender;
