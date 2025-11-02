@@ -1,0 +1,28 @@
+-- Create sleep and lifestyle health data table
+CREATE TABLE sleep_health_data1 (
+    PersonID INT,
+    Gender VARCHAR(10),
+    Age INT,
+    Occupation VARCHAR(100),
+    SleepDuration DECIMAL(4,2),
+    QualityOfSleep INT,
+    PhysicalActivityLevel INT,
+    StressLevel INT,
+    BMICategory VARCHAR(50),
+    BloodPressure VARCHAR(20),
+    HeartRate INT,
+    DailySteps INT,
+    SleepDisorder VARCHAR(50)
+);
+
+-- Import sleep health data
+BULK INSERT sleep_health_data
+FROM 'C:\Users\Tjasa\Downloads\Sleep_health_and_lifestyle_dataset.csv'
+WITH (
+    FIELDTERMINATOR = ',',
+    ROWTERMINATOR = '\n',
+    FIRSTROW = 2
+);
+
+-- Verify data
+SELECT TOP 5 * FROM sleep_health_data;
