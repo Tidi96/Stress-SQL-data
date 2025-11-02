@@ -1,0 +1,60 @@
+-- Create participants table
+IF OBJECT_ID('dbo.participants') IS NOT NULL DROP TABLE dbo.participants;
+
+CREATE TABLE participants (
+  participant_id INT PRIMARY KEY,
+  gender INT,
+  age INT,
+  stress_type VARCHAR(100)
+);
+
+INSERT INTO participants (participant_id, gender, age, stress_type)
+SELECT participant_id, Gender, Age, StressType
+FROM stress_data_with_id;
+
+-- Find people in BOTH tables (by age and gender)
+SELECT 
+    s.Gender,
+    s.Age,
+    s.RecentStress,
+    sh.StressLevel,
+    sh.QualityOfSleep,
+    sh.PhysicalActivityLevel
+FROM stress_data s
+INNER JOIN sleep_health_data sh 
+    ON s.Age = sh.Age 
+    AND s.Gender = CASE 
+        WHEN sh.Gender = 'Male' THEN 1 
+        WHEN sh.Gender = 'Female' THEN 2 
+        ELSE 0 
+    END;
+
+-- LEFT JOIN: All from stress_data, plus sleep data if available
+SELECT 
+    s.Gender,
+    s.Age,
+    s.RecentStress,
+    s.SleepProblems,
+    sh.QualityOfSleep,
+    sh.SleepDuration,
+    CASE 
+        WHEN sh.PersonID IS NULL THEN 'No sleep data'
+        ELSE 'Sleep data available'
+    END AS sleep_data_status
+FROM stress_data s
+LEFT JOIN sleep_health_data sh ON s.Age = sh.Age;
+
+-- Data without NULL values (only people in BOTH tables)
+SELECT 
+    s.Gender,
+    s.Age,
+    s.RecentStress,
+    s.SleepProblems,
+    sh.QualityOfSleep,
+    sh.SleepDuration,
+    sh.PhysicalActivityLevel,
+    sh.StressLevel AS stress_sleep_dataset,
+    sh.BMICategory
+FROM stress_data s
+INNER JOIN sleep_health_data sh ON s.Age = sh.Age
+WHERE sh.PersonID IS NOT NULL;
