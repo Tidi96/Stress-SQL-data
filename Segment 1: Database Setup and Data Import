@@ -1,0 +1,44 @@
+-- Create table for stress data
+CREATE TABLE stress_data1 (
+    Gender INT,
+    Age INT,
+    RecentStress INT,
+    RapidHeartbeat INT,
+    AnxietyTension INT,
+    SleepProblems INT,
+    AnxietyTensionRecent INT,
+    Headaches INT,
+    Irritated INT,
+    TroubleConcentrating INT,
+    SadnessLowMood INT,
+    HealthIssues INT,
+    LonelyIsolated INT,
+    OverwhelmedAcademic INT,
+    CompetitionAffects INT,
+    RelationshipStress INT,
+    DifficultiesWithProfessors INT,
+    UnpleasantWorkEnv INT,
+    NoRelaxationTime INT,
+    HostelHomeEnvDifficulties INT,
+    LackConfidenceAcademic INT,
+    LackConfidenceSubjects INT,
+    ActivitiesConflict INT,
+    AttendClassesRegularly INT,
+    WeightChange INT,
+    StressType VARCHAR(100)
+);
+
+-- Clear existing data from table
+TRUNCATE TABLE stress_data;
+
+-- Import data with BULK INSERT (adjusted for semicolon as delimiter)
+BULK INSERT stress_data
+FROM 'C:\Users\Tjasa\Downloads\Stress_Dataset.csv'
+WITH (
+    FIELDTERMINATOR = ';',
+    ROWTERMINATOR = '\n',
+    FIRSTROW = 2  -- Skip header row
+);
+
+-- Verify first few rows
+SELECT TOP 5 * FROM stress_data;
