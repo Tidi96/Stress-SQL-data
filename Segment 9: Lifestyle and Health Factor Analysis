@@ -1,0 +1,49 @@
+-- Impact of physical activity on stress (sleep health dataset only)
+SELECT 
+    CASE 
+        WHEN PhysicalActivityLevel < 30 THEN 'Low (<30 min)'
+        WHEN PhysicalActivityLevel BETWEEN 30 AND 60 THEN 'Medium (30-60 min)'
+        ELSE 'High (>60 min)'
+    END AS activity_level,
+    AVG(StressLevel) AS avg_stress,
+    AVG(QualityOfSleep) AS avg_sleep_quality,
+    AVG(SleepDuration) AS avg_sleep_duration,
+    COUNT(*) AS count
+FROM sleep_health_data
+GROUP BY CASE 
+        WHEN PhysicalActivityLevel < 30 THEN 'Low (<30 min)'
+        WHEN PhysicalActivityLevel BETWEEN 30 AND 60 THEN 'Medium (30-60 min)'
+        ELSE 'High (>60 min)'
+    END
+ORDER BY avg_stress;
+
+-- BMI category impact on stress and sleep disorders
+SELECT 
+    BMICategory,
+    AVG(StressLevel) AS avg_stress,
+    AVG(QualityOfSleep) AS avg_sleep_quality,
+    COUNT(*) AS total_people,
+    SUM(CASE WHEN SleepDisorder != 'None' THEN 1 ELSE 0 END) AS people_with_sleep_disorders,
+    ROUND(SUM(CASE WHEN SleepDisorder != 'None' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS disorder_percentage
+FROM sleep_health_data
+GROUP BY BMICategory
+ORDER BY avg_stress DESC;
+
+-- Blood pressure and stress analysis
+SELECT 
+    CASE 
+        WHEN CAST(SUBSTRING(BloodPressure, 1, CHARINDEX('/', BloodPressure)-1) AS INT) < 120 THEN 'Normal'
+        WHEN CAST(SUBSTRING(BloodPressure, 1, CHARINDEX('/', BloodPressure)-1) AS INT) BETWEEN 120 AND 139 THEN 'Elevated'
+        ELSE 'High'
+    END AS blood_pressure_category,
+    AVG(StressLevel) AS avg_stress,
+    AVG(QualityOfSleep) AS avg_sleep_quality,
+    COUNT(*) AS count
+FROM sleep_health_data
+WHERE BloodPressure IS NOT NULL AND BloodPressure LIKE '%/%'
+GROUP BY CASE 
+        WHEN CAST(SUBSTRING(BloodPressure, 1, CHARINDEX('/', BloodPressure)-1) AS INT) < 120 THEN 'Normal'
+        WHEN CAST(SUBSTRING(BloodPressure, 1, CHARINDEX('/', BloodPressure)-1) AS INT) BETWEEN 120 AND 139 THEN 'Elevated'
+        ELSE 'High'
+    END
+ORDER BY avg_stress DESC;
