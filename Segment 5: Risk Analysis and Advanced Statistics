@@ -1,0 +1,28 @@
+-- Identify high-risk individuals
+SELECT 
+    COUNT(*) AS high_risk_count,
+    ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM stress_data), 2) AS high_risk_percentage
+FROM stress_data
+WHERE RecentStress >= 8 AND SleepProblems >= 7 AND AnxietyTension >= 8;
+
+-- Demographic analysis of high-risk groups
+SELECT 
+    Gender,
+    AVG(Age) AS avg_age,
+    COUNT(*) AS high_risk_count
+FROM stress_data
+WHERE RecentStress >= 8 AND SleepProblems >= 7
+    AND Gender IS NOT NULL
+GROUP BY Gender;
+
+-- Advanced statistics using percentile functions (SQL Server 2012+)
+SELECT 
+    'RecentStress' AS variable,
+    MIN(RecentStress) AS minimum,
+    MAX(RecentStress) AS maximum,
+    AVG(RecentStress) AS average,
+    PERCENTILE_CONT(0.25) WITHIN GROUP (ORDER BY RecentStress) OVER () AS q1,
+    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY RecentStress) OVER () AS median,
+    PERCENTILE_CONT(0.75) WITHIN GROUP (ORDER BY RecentStress) OVER () AS q3
+FROM stress_data
+GROUP BY RecentStress;
