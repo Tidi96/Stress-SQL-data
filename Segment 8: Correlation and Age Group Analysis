@@ -1,0 +1,61 @@
+-- Age and stress correlation in both datasets
+WITH stress_corr AS (
+    SELECT 
+        (AVG(Age * RecentStress) - AVG(Age) * AVG(RecentStress)) / 
+        (STDEV(Age) * STDEV(RecentStress)) AS correlation_coefficient,
+        'Stress Dataset' AS dataset
+    FROM stress_data
+    WHERE Age IS NOT NULL
+),
+sleep_corr AS (
+    SELECT 
+        (AVG(Age * StressLevel) - AVG(Age) * AVG(StressLevel)) / 
+        (STDEV(Age) * STDEV(StressLevel)) AS correlation_coefficient,
+        'Sleep Health Dataset' AS dataset
+    FROM sleep_health_data
+    WHERE Age IS NOT NULL
+)
+SELECT * FROM stress_corr
+UNION ALL
+SELECT * FROM sleep_corr;
+
+-- Detailed analysis by age groups
+SELECT 
+    dataset,
+    age_group,
+    AVG(stress_level) AS avg_stress,
+    AVG(sleep_metric) AS avg_sleep_metric,
+    COUNT(*) AS count
+FROM (
+    -- Data from stress_data
+    SELECT 
+        'Stress Dataset' AS dataset,
+        CASE 
+            WHEN Age < 25 THEN 'Under 25'
+            WHEN Age BETWEEN 25 AND 35 THEN '25-35'
+            WHEN Age BETWEEN 36 AND 50 THEN '36-50'
+            ELSE 'Over 50'
+        END AS age_group,
+        RecentStress AS stress_level,
+        SleepProblems AS sleep_metric
+    FROM stress_data
+    WHERE Age IS NOT NULL
+    
+    UNION ALL
+    
+    -- Data from sleep_health_data
+    SELECT 
+        'Sleep Health Dataset' AS dataset,
+        CASE 
+            WHEN Age < 25 THEN 'Under 25'
+            WHEN Age BETWEEN 25 AND 35 THEN '25-35'
+            WHEN Age BETWEEN 36 AND 50 THEN '36-50'
+            ELSE 'Over 50'
+        END AS age_group,
+        StressLevel AS stress_level,
+        10 - QualityOfSleep AS sleep_metric
+    FROM sleep_health_data
+    WHERE Age IS NOT NULL
+) AS combined_data
+GROUP BY dataset, age_group
+ORDER BY dataset, age_group;
