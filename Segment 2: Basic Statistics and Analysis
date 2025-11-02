@@ -1,0 +1,18 @@
+-- Basic statistics for key columns
+SELECT 
+    AVG(RecentStress) AS avg_recent_stress,
+    AVG(SleepProblems) AS avg_sleep_problems,
+    AVG(AnxietyTension) AS avg_anxiety,
+    STDEV(RecentStress) AS stdev_stress,
+    COUNT(*) AS total_records
+FROM stress_data;
+
+-- Correlation analysis between stress, sleep problems, and anxiety
+SELECT 
+    (AVG(RecentStress * SleepProblems) - AVG(RecentStress) * AVG(SleepProblems)) / 
+    (STDEV(RecentStress) * STDEV(SleepProblems)) AS correlation_stress_sleep,   
+    (AVG(RecentStress * AnxietyTension) - AVG(RecentStress) * AVG(AnxietyTension)) / 
+    (STDEV(RecentStress) * STDEV(AnxietyTension)) AS correlation_stress_anxiety,   
+    (AVG(SleepProblems * AnxietyTension) - AVG(SleepProblems) * AVG(AnxietyTension)) / 
+    (STDEV(SleepProblems) * STDEV(AnxietyTension)) AS correlation_sleep_anxiety
+FROM stress_data;
